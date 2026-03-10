@@ -394,12 +394,14 @@ deletePostBtn.addEventListener("click", () => {
   saveToStorage();
 });
 
-// Spline으로 돌아가기 버튼 (SPLINE_BACK_URL 이 설정된 경우에만 표시)
-if (splineBackLink && SPLINE_BACK_URL) {
-  splineBackLink.href = SPLINE_BACK_URL;
+// 상단 X 버튼: 브라우저 뒤로가기
+if (splineBackLink) {
   splineBackLink.style.display = "";
-  splineBackLink.setAttribute("target", "_self");
-  splineBackLink.setAttribute("rel", "noopener");
+  splineBackLink.href = "javascript:void(0)";
+  splineBackLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    history.back();
+  });
 }
 
 render();
