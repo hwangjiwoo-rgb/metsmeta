@@ -33,8 +33,20 @@ body.panel-open {
 
 .spline-back-btn {
   flex-shrink: 0;
+  width: 40px;
+  height: 40px; /* 정사각형 비율 1:1 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 10px;
+  color: #333;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   text-decoration: none;
-  color: inherit;
 }
 
 .header-back-btn {
@@ -91,11 +103,15 @@ body.panel-open {
   background: #6c5ce7;
   color: #fff;
   border: none;
-  padding: 10px 20px;
+  padding: 0 20px;
   border-radius: 8px;
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
+  height: 40px; /* Cancel과 높이 맞춤 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .write-btn:hover {
