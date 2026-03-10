@@ -56,18 +56,18 @@ body.panel-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #fff; /* 상세 화살표: 흰색 배경 */
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
+  background: transparent; /* 배경 제거 */
+  border: none;            /* 스트로크 제거 */
+  border-radius: 0;
   color: #333;
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: none;
 }
 
 .header-back-btn:hover {
-  background: #f5f5f5;
+  background: transparent;
 }
 
 .board-title {
@@ -124,9 +124,9 @@ body.panel-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #fff; /* 등록 화살표: 흰색 배경 */
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  background: transparent; /* 배경 제거 */
+  border: none;            /* 스트로크 제거 */
+  border-radius: 0;
   font-size: 1.5rem;
   line-height: 1;
   color: #555;
@@ -134,7 +134,7 @@ body.panel-open {
 }
 
 .close-write-btn:hover {
-  background: #f5f5f5;
+  background: transparent;
   color: #333;
 }
 
