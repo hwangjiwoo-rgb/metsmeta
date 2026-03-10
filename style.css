@@ -138,6 +138,16 @@ body.panel-open {
   color: #333;
 }
 
+/* 공통 뒤로가기 아이콘 (대각선 꺾인 < 모양) */
+.back-arrow-icon {
+  width: 16px;
+  height: 16px;
+  border-left: 3px solid #111;
+  border-bottom: 3px solid #111;
+  transform: rotate(45deg);
+  box-sizing: border-box;
+}
+
 /* 고정 게시글: 각 항목이 개별 박스 + 드롭쉐도우 */
 .pinned-section {
   margin-bottom: 20px;
