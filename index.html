@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mets Meta Notice</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="board">
+  <div class="board-header">
+    <a id="splineBackLink" href="#" class="outline-btn spline-back-btn" style="display: none;">← Spline으로</a>
+    <h2 class="board-title">
+      <span id="boardTitleText">공지사항</span>
+      <span class="title-info" title="공지사항 안내">ⓘ</span>
+    </h2>
+    <button type="button" id="openWrite" class="write-btn">등록</button>
+    <button type="button" id="closeWriteBtn" class="close-write-btn hidden" aria-label="닫기">×</button>
+    <button type="button" id="headerBackBtn" class="header-back-btn hidden" aria-label="목록으로">×</button>
+  </div>
+
+  <!-- 고정 게시글: 각각 개별 박스 + 드롭쉐도우 -->
+  <section class="pinned-section">
+    <div id="pinnedArea" class="pinned-list"></div>
+    <div id="morePinnedWrap" class="more-pinned-wrap hidden">
+      <button type="button" id="morePinned" class="more-btn">
+        <span class="more-caret">▼</span> 더보기
+      </button>
+    </div>
+  </section>
+
+  <!-- 탭 + 리스트 한 박스 -->
+  <div id="listView" class="tabs-and-list-box">
+    <div class="tabs">
+      <button type="button" id="tabNotice" class="tab active" data-tab="notice">공지사항</button>
+      <button type="button" id="tabFree" class="tab" data-tab="free">자유게시판</button>
+    </div>
+    <div id="noticeList" class="content-list" data-content="notice"></div>
+    <div id="freeList" class="content-list hidden" data-content="free"></div>
+  </div>
+
+  <!-- 등록/수정하기 페이지 (공지사항처럼 한 박스, 팝업 아님) -->
+  <section id="writeSection" class="write-section hidden">
+    <div class="write-section-box">
+      <div class="write-tabs">
+        <button type="button" id="writeTabNotice" class="write-tab active" data-write-type="notice">공지사항</button>
+        <button type="button" id="writeTabFree" class="write-tab" data-write-type="free">자유게시판</button>
+      </div>
+      <div class="write-form-wrap">
+        <label class="field-label" for="titleInput">제목</label>
+        <input id="titleInput" type="text" class="field-input" placeholder="제목을 입력하세요">
+        <label class="field-label" for="contentInput">내용</label>
+        <textarea id="contentInput" class="field-textarea" placeholder="내용을 자세히 입력하세요" rows="6"></textarea>
+        <div class="write-actions">
+          <button type="button" id="savePost" class="submit-btn">등록하기</button>
+          <button type="button" id="cancelEdit" class="outline-btn hidden">취소</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 글 상세 (뎁스로 들어간 화면: 제목, 내용 등) -->
+  <div id="detailPanel" class="detail-panel hidden">
+    <div class="detail-panel-inner">
+      <div class="detail-header">
+        <h3 id="detailTitle" class="detail-title"></h3>
+        <span id="detailDate" class="detail-date"></span>
+      </div>
+      <p id="detailContent" class="detail-content"></p>
+      <div class="detail-actions">
+        <button type="button" id="editPostBtn" class="submit-btn">수정하기</button>
+        <button type="button" id="deletePostBtn" class="icon-btn detail-delete-btn" aria-label="삭제하기" title="삭제하기">🗑️</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
