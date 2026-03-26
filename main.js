@@ -5,6 +5,7 @@ const STORAGE_KEY = "metsmeta_board";
 //   예: https://metsmeta.vercel.app/?board=1
 const BOARD_HASH = "#board";
 const BOARD_SESSION_KEY = "metsmeta_open_board_v1";
+const SPLINE_EMBED_URL = "https://my.spline.design/metsmeta-vAALQ7iJtAMd6hdI6sOMGV0t/";
 
 function shouldOpenBoardFromUrl() {
   if (location.hash.toLowerCase() === BOARD_HASH) return true;
@@ -486,23 +487,36 @@ render();
 consumeBoardSessionFlag();
 syncBoardOverlayFromUrl();
 
+function resetSplineIframeToEmbed() {
+  const el = document.getElementById("splineIframe");
+  if (!el) return;
+  try {
+    el.src = SPLINE_EMBED_URL;
+  } catch (err) {}
+}
+
 window.addEventListener("message", (e) => {
   if (e.origin !== location.origin) return;
   if (!e.data || e.data.type !== "metsmeta-open-board") return;
-  let applied = false;
-  if (e.data.href && typeof e.data.href === "string") {
-    try {
+  try {
+    if (e.data.href && typeof e.data.href === "string") {
       const u = new URL(e.data.href, location.href);
       if (u.origin === location.origin) {
         history.replaceState(null, "", u.pathname + u.search + u.hash);
-        applied = true;
       }
-    } catch (err) {}
+    } else {
+      const params = new URLSearchParams(location.search);
+      params.set("board", "1");
+      history.replaceState(null, "", `${location.pathname}?${params.toString()}`);
+    }
+  } catch (err) {
+    const params = new URLSearchParams(location.search);
+    params.set("board", "1");
+    history.replaceState(null, "", `${location.pathname}?${params.toString()}`);
   }
-  if (!applied && !shouldOpenBoardFromUrl()) {
-    history.replaceState(null, "", `${location.pathname}${location.search}${BOARD_HASH}`);
-  }
-  syncBoardOverlayFromUrl();
+  boardOverlayOpen();
+  if (splineBackLink) splineBackLink.style.display = "";
+  resetSplineIframeToEmbed();
 });
 
 (function notifyParentIfBoardOpenInIframe() {
