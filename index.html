@@ -6,8 +6,23 @@
 <title>Mets Meta Notice</title>
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="app-spline">
 
+  <!-- Spline 3D (전체 배경). Notice Board 클릭 시 Spline에서 이 페이지 URL + #board 로 연결 -->
+  <div id="splineStage" class="spline-stage">
+    <iframe
+      title="Mets Meta Spline"
+      src="https://my.spline.design/metsmeta-vAALQ7iJtAMd6hdI6sOMGV0t/"
+      frameborder="0"
+      width="100%"
+      height="100%"
+    ></iframe>
+  </div>
+
+  <!-- 게시판: Spline 위 큰 팝업 느낌 오버레이 (#board 일 때 표시) -->
+  <div id="boardOverlay" class="board-overlay hidden" aria-hidden="true">
+    <button type="button" id="boardOverlayBackdrop" class="board-overlay-backdrop" aria-label="닫기"></button>
+    <div class="board-overlay-panel" role="dialog" aria-labelledby="boardTitleText">
   <div class="board">
   <div class="board-header">
     <button type="button" id="headerBackBtn" class="header-back-btn hidden" aria-label="뒤로가기">
@@ -78,7 +93,9 @@
       </div>
     </div>
   </div>
-</div>
+  </div>
+    </div>
+  </div>
 
 <script src="main.js"></script>
 </body>

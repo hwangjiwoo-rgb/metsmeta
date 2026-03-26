@@ -9,6 +9,81 @@ body {
   margin: 0;
 }
 
+/* Spline 풀스크린 + 게시판 오버레이 레이아웃 */
+body.app-spline {
+  padding: 0;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+html:has(body.app-spline) {
+  height: 100%;
+}
+
+body.app-spline .spline-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: #0a0a12;
+}
+
+body.app-spline .spline-stage iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.board-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: min(28px, 5vw);
+  box-sizing: border-box;
+}
+
+.board-overlay.hidden {
+  display: none !important;
+}
+
+.board-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: rgba(10, 10, 18, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+.board-overlay-panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 720px;
+  max-height: min(92vh, 880px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 16px;
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+body.app-spline .board-overlay-panel .board {
+  max-width: none;
+  margin: 0;
+  border-radius: 16px;
+  box-shadow: none;
+}
+
 body.panel-open {
   overflow: hidden;
 }

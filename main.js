@@ -1,8 +1,7 @@
 const STORAGE_KEY = "metsmeta_board";
 
-// Spline으로 돌아가기 링크 (Netlify 공지판에서 Spline 씬이 있는 페이지로 이동)
-// Spline 씬이 열려 있는 전체 URL로 변경하세요. 예: Spline 공유 링크 또는 Spline을 넣은 페이지
-const SPLINE_BACK_URL = "https://my.spline.design/";
+// Spline에서 Notice Board 클릭 시 열 URL: 배포 도메인 + 이 해시 (예: https://yoursite.netlify.app/#board)
+const BOARD_HASH = "#board";
 
 const defaultNotices = [
   { id: 1, title: "회의실 예약 방법", content: "회의실 예약은 메타버스에서 가능합니다.", date: "2026.03.09", pinned: true },
@@ -88,6 +87,8 @@ const detailContent = document.getElementById("detailContent");
 const detailDate = document.getElementById("detailDate");
 const editPostBtn = document.getElementById("editPostBtn");
 const deletePostBtn = document.getElementById("deletePostBtn");
+const boardOverlay = document.getElementById("boardOverlay");
+const boardOverlayBackdrop = document.getElementById("boardOverlayBackdrop");
 
 function togglePin(notice, e) {
   if (e) e.stopPropagation();
@@ -394,14 +395,49 @@ deletePostBtn.addEventListener("click", () => {
   saveToStorage();
 });
 
-// 상단 X 버튼: 브라우저 뒤로가기
+function boardOverlayOpen() {
+  if (!boardOverlay) return;
+  boardOverlay.classList.remove("hidden");
+  boardOverlay.setAttribute("aria-hidden", "false");
+  document.body.classList.add("panel-open");
+  if (splineBackLink) splineBackLink.style.display = "";
+}
+
+function boardOverlayClose() {
+  if (!boardOverlay) return;
+  boardOverlay.classList.add("hidden");
+  boardOverlay.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("panel-open");
+  closeDetailPanel();
+  hideWriteSection();
+  if (splineBackLink) splineBackLink.style.display = "none";
+}
+
+function syncBoardOverlayFromHash() {
+  if (!boardOverlay) return;
+  if (location.hash === BOARD_HASH) boardOverlayOpen();
+  else boardOverlayClose();
+}
+
+function closeBoardToSpline() {
+  const base = `${location.pathname}${location.search}`;
+  if (location.hash === BOARD_HASH) history.replaceState(null, "", base);
+  boardOverlayClose();
+}
+
+window.addEventListener("hashchange", syncBoardOverlayFromHash);
+
+if (boardOverlayBackdrop) {
+  boardOverlayBackdrop.addEventListener("click", closeBoardToSpline);
+}
+
 if (splineBackLink) {
-  splineBackLink.style.display = "";
-  splineBackLink.href = "javascript:void(0)";
+  splineBackLink.href = "#";
   splineBackLink.addEventListener("click", (e) => {
     e.preventDefault();
-    history.back();
+    closeBoardToSpline();
   });
 }
 
 render();
+syncBoardOverlayFromHash();
