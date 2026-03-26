@@ -1,7 +1,30 @@
 const STORAGE_KEY = "metsmeta_board";
 
-// Spline에서 Notice Board 클릭 시 열 URL: 배포 도메인 + 이 해시 (예: https://yoursite.netlify.app/#board)
+// Spline에서 Notice Board 클릭 시 열 URL (배포 주소 기준):
+//   Vercel 등은 리다이렉트 시 #board 가 사라질 수 있어 ?board=1 을 권장합니다.
+//   예: https://metsmeta.vercel.app/?board=1
 const BOARD_HASH = "#board";
+const BOARD_SESSION_KEY = "metsmeta_open_board_v1";
+
+function shouldOpenBoardFromUrl() {
+  if (location.hash.toLowerCase() === BOARD_HASH) return true;
+  const params = new URLSearchParams(location.search);
+  if (params.get("board") === "1" || params.get("board") === "true") return true;
+  if (params.get("view") === "board") return true;
+  return false;
+}
+
+(function splineIframeBreakoutToTop() {
+  if (!shouldOpenBoardFromUrl()) return;
+  if (window.parent === window) return;
+  try {
+    // 최상위로 올라간 뒤 해시가 날아가도(리다이렉트) 게시판을 열 수 있게 플래그 저장
+    sessionStorage.setItem(BOARD_SESSION_KEY, "1");
+    window.top.location.replace(location.href);
+  } catch (e) {
+    // 다른 도메인 iframe이면 접근 불가 — Spline에 넣는 URL은 반드시 이 페이지와 같은 도메인이어야 합니다.
+  }
+})();
 
 const defaultNotices = [
   { id: 1, title: "회의실 예약 방법", content: "회의실 예약은 메타버스에서 가능합니다.", date: "2026.03.09", pinned: true },
@@ -413,19 +436,39 @@ function boardOverlayClose() {
   if (splineBackLink) splineBackLink.style.display = "none";
 }
 
-function syncBoardOverlayFromHash() {
+function consumeBoardSessionFlag() {
+  try {
+    if (sessionStorage.getItem(BOARD_SESSION_KEY) !== "1") return;
+    sessionStorage.removeItem(BOARD_SESSION_KEY);
+    if (!shouldOpenBoardFromUrl()) {
+      const base = `${location.pathname}${location.search}`;
+      history.replaceState(null, "", `${base}${BOARD_HASH}`);
+    }
+  } catch (e) {}
+}
+
+function syncBoardOverlayFromUrl() {
   if (!boardOverlay) return;
-  if (location.hash === BOARD_HASH) boardOverlayOpen();
+  if (shouldOpenBoardFromUrl()) boardOverlayOpen();
   else boardOverlayClose();
 }
 
+function getUrlWithoutBoard() {
+  const path = location.pathname;
+  const params = new URLSearchParams(location.search);
+  params.delete("board");
+  params.delete("view");
+  const qs = params.toString();
+  return qs ? `${path}?${qs}` : path;
+}
+
 function closeBoardToSpline() {
-  const base = `${location.pathname}${location.search}`;
-  if (location.hash === BOARD_HASH) history.replaceState(null, "", base);
+  history.replaceState(null, "", getUrlWithoutBoard());
   boardOverlayClose();
 }
 
-window.addEventListener("hashchange", syncBoardOverlayFromHash);
+window.addEventListener("hashchange", syncBoardOverlayFromUrl);
+window.addEventListener("popstate", syncBoardOverlayFromUrl);
 
 if (boardOverlayBackdrop) {
   boardOverlayBackdrop.addEventListener("click", closeBoardToSpline);
@@ -440,4 +483,32 @@ if (splineBackLink) {
 }
 
 render();
-syncBoardOverlayFromHash();
+consumeBoardSessionFlag();
+syncBoardOverlayFromUrl();
+
+window.addEventListener("message", (e) => {
+  if (e.origin !== location.origin) return;
+  if (!e.data || e.data.type !== "metsmeta-open-board") return;
+  let applied = false;
+  if (e.data.href && typeof e.data.href === "string") {
+    try {
+      const u = new URL(e.data.href, location.href);
+      if (u.origin === location.origin) {
+        history.replaceState(null, "", u.pathname + u.search + u.hash);
+        applied = true;
+      }
+    } catch (err) {}
+  }
+  if (!applied && !shouldOpenBoardFromUrl()) {
+    history.replaceState(null, "", `${location.pathname}${location.search}${BOARD_HASH}`);
+  }
+  syncBoardOverlayFromUrl();
+});
+
+(function notifyParentIfBoardOpenInIframe() {
+  if (window.parent === window) return;
+  if (!shouldOpenBoardFromUrl()) return;
+  try {
+    window.parent.postMessage({ type: "metsmeta-open-board", href: location.href }, location.origin);
+  } catch (e) {}
+})();
