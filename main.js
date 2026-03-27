@@ -1,32 +1,5 @@
 const STORAGE_KEY = "metsmeta_board";
 
-// Spline에서 Notice Board 클릭 시 열 URL (배포 주소 기준):
-//   Vercel 등은 리다이렉트 시 #board 가 사라질 수 있어 ?board=1 을 권장합니다.
-//   예: https://metsmeta.vercel.app/?board=1
-const BOARD_HASH = "#board";
-const BOARD_SESSION_KEY = "metsmeta_open_board_v1";
-const SPLINE_EMBED_URL = "https://my.spline.design/metsmeta-vAALQ7iJtAMd6hdI6sOMGV0t/";
-
-function shouldOpenBoardFromUrl() {
-  if (location.hash.toLowerCase() === BOARD_HASH) return true;
-  const params = new URLSearchParams(location.search);
-  if (params.get("board") === "1" || params.get("board") === "true") return true;
-  if (params.get("view") === "board") return true;
-  return false;
-}
-
-(function splineIframeBreakoutToTop() {
-  if (!shouldOpenBoardFromUrl()) return;
-  if (window.parent === window) return;
-  try {
-    // 최상위로 올라간 뒤 해시가 날아가도(리다이렉트) 게시판을 열 수 있게 플래그 저장
-    sessionStorage.setItem(BOARD_SESSION_KEY, "1");
-    window.top.location.replace(location.href);
-  } catch (e) {
-    // 다른 도메인 iframe이면 접근 불가 — Spline에 넣는 URL은 반드시 이 페이지와 같은 도메인이어야 합니다.
-  }
-})();
-
 const defaultNotices = [
   { id: 1, title: "회의실 예약 방법", content: "회의실 예약은 메타버스에서 가능합니다.", date: "2026.03.09", pinned: true },
   { id: 2, title: "법인카드 비용 신청 방법", content: "법인카드는 재무팀 승인 후 발급됩니다.", date: "2026.03.09", pinned: true },
@@ -111,8 +84,6 @@ const detailContent = document.getElementById("detailContent");
 const detailDate = document.getElementById("detailDate");
 const editPostBtn = document.getElementById("editPostBtn");
 const deletePostBtn = document.getElementById("deletePostBtn");
-const boardOverlay = document.getElementById("boardOverlay");
-const boardOverlayBackdrop = document.getElementById("boardOverlayBackdrop");
 
 function togglePin(notice, e) {
   if (e) e.stopPropagation();
@@ -419,110 +390,13 @@ deletePostBtn.addEventListener("click", () => {
   saveToStorage();
 });
 
-function boardOverlayOpen() {
-  if (!boardOverlay) return;
-  boardOverlay.classList.remove("hidden");
-  boardOverlay.setAttribute("aria-hidden", "false");
-  document.body.classList.add("panel-open");
-  if (splineBackLink) splineBackLink.style.display = "";
-}
-
-function boardOverlayClose() {
-  if (!boardOverlay) return;
-  boardOverlay.classList.add("hidden");
-  boardOverlay.setAttribute("aria-hidden", "true");
-  document.body.classList.remove("panel-open");
-  closeDetailPanel();
-  hideWriteSection();
-  if (splineBackLink) splineBackLink.style.display = "none";
-}
-
-function consumeBoardSessionFlag() {
-  try {
-    if (sessionStorage.getItem(BOARD_SESSION_KEY) !== "1") return;
-    sessionStorage.removeItem(BOARD_SESSION_KEY);
-    if (!shouldOpenBoardFromUrl()) {
-      const base = `${location.pathname}${location.search}`;
-      history.replaceState(null, "", `${base}${BOARD_HASH}`);
-    }
-  } catch (e) {}
-}
-
-function syncBoardOverlayFromUrl() {
-  if (!boardOverlay) return;
-  if (shouldOpenBoardFromUrl()) boardOverlayOpen();
-  else boardOverlayClose();
-}
-
-function getUrlWithoutBoard() {
-  const path = location.pathname;
-  const params = new URLSearchParams(location.search);
-  params.delete("board");
-  params.delete("view");
-  const qs = params.toString();
-  return qs ? `${path}?${qs}` : path;
-}
-
-function closeBoardToSpline() {
-  history.replaceState(null, "", getUrlWithoutBoard());
-  boardOverlayClose();
-}
-
-window.addEventListener("hashchange", syncBoardOverlayFromUrl);
-window.addEventListener("popstate", syncBoardOverlayFromUrl);
-
-if (boardOverlayBackdrop) {
-  boardOverlayBackdrop.addEventListener("click", closeBoardToSpline);
-}
-
 if (splineBackLink) {
-  splineBackLink.href = "#";
+  splineBackLink.style.display = "";
+  splineBackLink.href = "javascript:void(0)";
   splineBackLink.addEventListener("click", (e) => {
     e.preventDefault();
-    closeBoardToSpline();
+    history.back();
   });
 }
 
 render();
-consumeBoardSessionFlag();
-syncBoardOverlayFromUrl();
-
-function resetSplineIframeToEmbed() {
-  const el = document.getElementById("splineIframe");
-  if (!el) return;
-  try {
-    el.src = SPLINE_EMBED_URL;
-  } catch (err) {}
-}
-
-window.addEventListener("message", (e) => {
-  if (e.origin !== location.origin) return;
-  if (!e.data || e.data.type !== "metsmeta-open-board") return;
-  try {
-    if (e.data.href && typeof e.data.href === "string") {
-      const u = new URL(e.data.href, location.href);
-      if (u.origin === location.origin) {
-        history.replaceState(null, "", u.pathname + u.search + u.hash);
-      }
-    } else {
-      const params = new URLSearchParams(location.search);
-      params.set("board", "1");
-      history.replaceState(null, "", `${location.pathname}?${params.toString()}`);
-    }
-  } catch (err) {
-    const params = new URLSearchParams(location.search);
-    params.set("board", "1");
-    history.replaceState(null, "", `${location.pathname}?${params.toString()}`);
-  }
-  boardOverlayOpen();
-  if (splineBackLink) splineBackLink.style.display = "";
-  resetSplineIframeToEmbed();
-});
-
-(function notifyParentIfBoardOpenInIframe() {
-  if (window.parent === window) return;
-  if (!shouldOpenBoardFromUrl()) return;
-  try {
-    window.parent.postMessage({ type: "metsmeta-open-board", href: location.href }, location.origin);
-  } catch (e) {}
-})();

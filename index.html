@@ -6,25 +6,8 @@
 <title>Mets Meta Notice</title>
 <link rel="stylesheet" href="style.css">
 </head>
-<body class="app-spline">
+<body>
 
-  <!-- Spline Notice Board URL 권장: https://metsmeta.vercel.app/?board=1 (Vercel에서 #board 가 날아가는 경우가 있어 쿼리가 더 안전) -->
-  <div id="splineStage" class="spline-stage">
-    <iframe
-      id="splineIframe"
-      title="Mets Meta Spline"
-      src="https://my.spline.design/metsmeta-vAALQ7iJtAMd6hdI6sOMGV0t/"
-      frameborder="0"
-      width="100%"
-      height="100%"
-      allow="fullscreen; xr-spatial-tracking"
-    ></iframe>
-  </div>
-
-  <!-- 게시판: Spline 위 큰 팝업 느낌 오버레이 (#board 일 때 표시) -->
-  <div id="boardOverlay" class="board-overlay hidden" aria-hidden="true">
-    <button type="button" id="boardOverlayBackdrop" class="board-overlay-backdrop" aria-label="닫기"></button>
-    <div class="board-overlay-panel" role="dialog" aria-labelledby="boardTitleText">
   <div class="board">
   <div class="board-header">
     <button type="button" id="headerBackBtn" class="header-back-btn hidden" aria-label="뒤로가기">
@@ -93,9 +76,6 @@
         <button type="button" id="editPostBtn" class="submit-btn">수정하기</button>
         <button type="button" id="deletePostBtn" class="icon-btn detail-delete-btn" aria-label="삭제하기" title="삭제하기">🗑️</button>
       </div>
-    </div>
-  </div>
-  </div>
     </div>
   </div>
 
